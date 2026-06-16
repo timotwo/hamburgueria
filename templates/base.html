@@ -12,6 +12,7 @@
 <nav class="navbar">
   <div class="nav-brand">🍔 <span>Vendas Burger</span></div>
   <div class="nav-links">
+    <div class="nav-toggle" onclick="toggleMenu()">☰</div>
     {% set nivel = session.nivel_acesso %}
     {% if nivel in ['ADMINISTRADOR','GARCON'] %}
       <a href="/pedidos/novo" class="btn-nav">+ Novo Pedido</a>
@@ -32,6 +33,7 @@
     <span class="nav-user">{{ session.usuario_nome }} ({{ nivel }})</span>
     <a href="/logout" class="btn-nav btn-logout">Sair</a>
   </div>
+  
 </nav>
 {% endif %}
 
@@ -43,5 +45,11 @@
   {% endwith %}
   {% block content %}{% endblock %}
 </main>
+<script>
+function toggleMenu() {
+  const nav = document.getElementById("navLinks");
+  nav.classList.toggle("active");
+}
+</script>
 </body>
 </html>
