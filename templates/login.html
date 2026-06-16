@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — Vendas Burger</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-box">
+    <div class="login-logo">🍔 Vendas Burger</div>
+    <p class="login-sub">Acesso ao sistema interno</p>
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% for cat, msg in msgs %}
+        <div class="alert alert-{{ cat }}" style="margin-bottom:14px;">{{ msg }}</div>
+      {% endfor %}
+    {% endwith %}
+    <form method="POST" action="/login">
+      <div class="form-group">
+        <label>Usuário</label>
+        <input type="text" name="usuario" required autofocus placeholder="nome de usuário"/>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" name="senha" required placeholder="••••••••"/>
+      </div>
+      <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:12px;">Entrar</button>
+    </form>
+    <p style="margin-top:18px;font-size:.78rem;color:var(--muted)">
+      <a href="/cardapio" style="color:var(--gold);text-decoration:none;">Ver Cardápio Digital →</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>

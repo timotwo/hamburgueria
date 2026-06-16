@@ -1,0 +1,81 @@
+
+{% extends "base.html" %}
+{% block title %}Usuários — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Usuários</h1>
+</div>
+
+<div class="two-col">
+  <!-- Formulário -->
+  <div class="card">
+    <div class="card-title">{% if usuario %}Editar Usuário{% else %}Novo Usuário{% endif %}</div>
+    <form method="POST" action="{% if usuario %}/usuarios/atualizar/{{ usuario.id }}{% else %}/usuarios/adicionar{% endif %}">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Nome completo</label>
+        <input type="text" name="nome" required value="{{ usuario.nome if usuario else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>CPF</label>
+        <input type="text" name="cpf" required placeholder="000.000.000-00" value="{{ usuario.cpf if usuario else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Data de Nascimento</label>
+        <input type="date" name="data_nascimento" value="{{ usuario.data_nascimento if usuario else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Nome de Usuário</label>
+        <input type="text" name="usuario" required value="{{ usuario.usuario if usuario else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Nível de Acesso</label>
+        <select name="nivel_acesso" required>
+          {% for nivel in ['ADMINISTRADOR','GARCON','CHAPISTA','ENTREGADOR'] %}
+            <option value="{{ nivel }}" {% if usuario and usuario.nivel_acesso == nivel %}selected{% endif %}>{{ nivel }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      {% if not usuario %}
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:12px;">A senha padrão será: <strong>H@mburger123</strong></p>
+      {% endif %}
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">{% if usuario %}Salvar{% else %}Cadastrar{% endif %}</button>
+        {% if usuario %}<a href="/usuarios" class="btn btn-secondary">Cancelar</a>{% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Lista -->
+  <div class="card">
+    <div class="card-title">Usuários Cadastrados</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Usuário</th>
+            <th>Nível</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for u in usuarios %}
+          <tr>
+            <td>{{ u.nome }}<br><small style="color:var(--muted)">{{ u.cpf }}</small></td>
+            <td>{{ u.usuario }}</td>
+            <td><span class="badge badge-cadastrado">{{ u.nivel_acesso }}</span></td>
+            <td>
+              <a href="/usuarios/editar/{{ u.id }}" class="btn btn-secondary btn-sm">Editar</a>
+              <a href="/usuarios/excluir/{{ u.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Desativar usuário?')">Remover</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="color:var(--muted);text-align:center;">Nenhum usuário cadastrado.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

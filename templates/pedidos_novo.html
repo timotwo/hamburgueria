@@ -1,0 +1,142 @@
+
+{% extends "base.html" %}
+{% block title %}Novo Pedido — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Novo Pedido</h1>
+  <a href="/pedidos" class="btn btn-secondary">← Voltar</a>
+</div>
+
+<div class="two-col">
+  <!-- Painel esquerdo: adicionar item -->
+  <div>
+    <div class="card">
+      <div class="card-title">Adicionar Item</div>
+      <form method="POST" action="/pedidos/adicionar-item">
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Produto</label>
+          <select name="produto_id" required id="sel-produto">
+            <option value="">Selecione...</option>
+            {% for p in produtos %}
+              <option value="{{ p.id_produto }}" data-preco="{{ p.preco }}">{{ p.nome }} — R$ {{ "%.2f"|format(p.preco|float) }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:10px;">
+          <label>Quantidade</label>
+          <input type="number" name="quantidade" min="1" value="1" required/>
+        </div>
+        <div class="form-group" style="margin-bottom:16px;">
+          <label>Observações</label>
+          <input type="text" name="observacoes" placeholder="Ex: sem cebola"/>
+        </div>
+        <button type="submit" class="btn btn-primary">+ Adicionar ao Pedido</button>
+      </form>
+    </div>
+
+    <!-- Concluir pedido -->
+    <div class="card">
+      <div class="card-title">Concluir Pedido</div>
+      <form method="POST" action="/pedidos/concluir" id="form-concluir">
+        <div class="form-group" style="margin-bottom:12px;">
+          <label>Tipo de Pedido</label>
+          <select name="tipo_pedido" id="tipo-pedido" required>
+            <option value="CONSUMO_LOCAL">🍽️ Consumo Local</option>
+            <option value="DELIVERY">🛵 Delivery</option>
+          </select>
+        </div>
+
+        <div id="campo-mesa" style="margin-bottom:12px;">
+          <div class="form-group">
+            <label>Número da Mesa</label>
+            <input type="number" name="numero_mesa" min="1" placeholder="Ex: 5"/>
+          </div>
+        </div>
+
+        <div id="campo-delivery" style="display:none;margin-bottom:12px;">
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Cliente</label>
+            <select name="cliente_id">
+              <option value="">Selecione um cliente...</option>
+              {% for c in clientes %}
+                <option value="{{ c.id }}">{{ c.nome }} — {{ c.telefone }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Taxa de Entrega (R$)</label>
+            <input type="text" name="taxa_entrega" placeholder="0,00"/>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-success" {% if not itens %}disabled{% endif %}>
+          ✅ Concluir Pedido
+        </button>
+        {% if not itens %}
+          <p style="font-size:.78rem;color:var(--muted);margin-top:8px;">Adicione ao menos um item.</p>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <!-- Painel direito: itens no pedido -->
+  <div class="card">
+    <div class="card-title">Itens do Pedido
+      {% if itens %}
+        <span style="font-family:var(--font-body);font-size:.85rem;color:var(--muted);font-weight:400;">({{ itens|length }} item(ns))</span>
+      {% endif %}
+    </div>
+    {% if itens %}
+    <ul class="item-list">
+      {% for item in itens %}
+      <li>
+        <div class="item-info">
+          <strong>{{ item.produto_nome }}</strong>
+          <small>Qtd: {{ item.quantidade }} × R$ {{ "%.2f"|format(item.preco|float) }} = R$ {{ "%.2f"|format(item.quantidade * item.preco|float) }}</small>
+          {% if item.observacoes %}<small style="color:var(--warning);">📝 {{ item.observacoes }}</small>{% endif %}
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <!-- Edit inline -->
+          <form method="POST" action="/pedidos/editar-item/{{ loop.index0 }}" style="display:flex;gap:4px;">
+            <input type="number" name="quantidade" value="{{ item.quantidade }}" min="1" style="width:60px;padding:4px;"/>
+            <input type="text" name="observacoes" value="{{ item.observacoes }}" placeholder="obs" style="width:90px;padding:4px;"/>
+            <button type="submit" class="btn btn-secondary btn-sm">✏️</button>
+          </form>
+          <a href="/pedidos/remover-item/{{ loop.index0 }}" class="btn btn-danger btn-sm"
+             onclick="return confirm('Remover item?')">✕</a>
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    <div style="margin-top:14px;padding-top:14px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;">
+      <span style="font-family:var(--font-head);font-size:1.5rem;color:var(--gold);">
+        Total: R$ {{ "%.2f"|format(itens|sum(attribute='preco') if false else itens|map(attribute='preco')|list|sum) }}
+      </span>
+    </div>
+    {% else %}
+    <div style="text-align:center;padding:40px 0;color:var(--muted);">
+      <div style="font-size:2.5rem;margin-bottom:12px;">🛒</div>
+      <p>Nenhum item adicionado ainda.</p>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+const tipo = document.getElementById('tipo-pedido');
+const mesa = document.getElementById('campo-mesa');
+const delivery = document.getElementById('campo-delivery');
+function toggleTipo() {
+  if (tipo.value === 'DELIVERY') {
+    mesa.style.display = 'none';
+    delivery.style.display = 'block';
+  } else {
+    mesa.style.display = 'block';
+    delivery.style.display = 'none';
+  }
+}
+tipo.addEventListener('change', toggleTipo);
+toggleTipo();
+</script>
+{% endblock %}
+

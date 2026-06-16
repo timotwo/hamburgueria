@@ -1,0 +1,38 @@
+
+
+{% extends "base.html" %}
+{% block title %}Pagamentos Pendentes — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Pagamentos Pendentes</h1>
+  <a href="/pagamentos/historico" class="btn btn-secondary">Histórico</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>#</th><th>Tipo</th><th>Mesa/Cliente</th><th>Status</th><th>Data</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr>
+          <td><strong>#{{ p.id }}</strong></td>
+          <td>{% if p.tipo_pedido=='DELIVERY' %}🛵 Delivery{% else %}🍽️ Local{% endif %}</td>
+          <td>
+            {% if p.tipo_pedido=='CONSUMO_LOCAL' %}Mesa {{ p.numero_mesa }}
+            {% elif p.clientes %}{{ p.clientes.nome }}
+            {% else %}—{% endif %}
+          </td>
+          <td><span class="badge badge-{{ p.status_pedido|lower }}">{{ p.status_pedido.replace('_',' ') }}</span></td>
+          <td style="color:var(--muted);font-size:.82rem;">{{ p.data_pedido[:16] if p.data_pedido else '—' }}</td>
+          <td><a href="/pagamentos/registrar/{{ p.id }}" class="btn btn-success btn-sm">Registrar Pagamento</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="6" style="color:var(--muted);text-align:center;padding:24px;">Nenhum pagamento pendente.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

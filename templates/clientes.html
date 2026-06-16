@@ -1,0 +1,55 @@
+
+{% extends "base.html" %}
+{% block title %}Clientes — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Clientes</h1>
+</div>
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">{% if cliente %}Editar Cliente{% else %}Novo Cliente{% endif %}</div>
+    <form method="POST" action="{% if cliente %}/clientes/atualizar/{{ cliente.id }}{% else %}/clientes/adicionar{% endif %}">
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Nome</label>
+        <input type="text" name="nome" required value="{{ cliente.nome if cliente else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Telefone</label>
+        <input type="text" name="telefone" required value="{{ cliente.telefone if cliente else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Endereço</label>
+        <textarea name="endereco">{{ cliente.endereco if cliente else '' }}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">{% if cliente %}Salvar{% else %}Adicionar{% endif %}</button>
+        {% if cliente %}<a href="/clientes" class="btn btn-secondary">Cancelar</a>{% endif %}
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Clientes Cadastrados</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Telefone</th><th>Endereço</th><th>Ações</th></tr></thead>
+        <tbody>
+          {% for c in clientes %}
+          <tr>
+            <td><strong>{{ c.nome }}</strong></td>
+            <td>{{ c.telefone }}</td>
+            <td style="color:var(--muted)">{{ c.endereco }}</td>
+            <td>
+              <a href="/clientes/editar/{{ c.id }}" class="btn btn-secondary btn-sm">Editar</a>
+              <a href="/clientes/excluir/{{ c.id }}" class="btn btn-danger btn-sm" onclick="return confirm('Excluir cliente?')">Excluir</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="color:var(--muted);text-align:center;">Nenhum cliente.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

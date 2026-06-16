@@ -1,0 +1,50 @@
+
+{% extends "base.html" %}
+{% block title %}Categorias — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Categorias</h1>
+</div>
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">{% if categoria %}Editar Categoria{% else %}Nova Categoria{% endif %}</div>
+    <form method="POST" action="{% if categoria %}/categorias/atualizar/{{ categoria.id_categoria }}{% else %}/categorias/adicionar{% endif %}">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label>Nome</label>
+        <input type="text" name="nome" required value="{{ categoria.nome if categoria else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Descrição</label>
+        <textarea name="descricao">{{ categoria.descricao if categoria else '' }}</textarea>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">{% if categoria %}Salvar{% else %}Adicionar{% endif %}</button>
+        {% if categoria %}<a href="/categorias" class="btn btn-secondary">Cancelar</a>{% endif %}
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Categorias Cadastradas</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Descrição</th><th>Ações</th></tr></thead>
+        <tbody>
+          {% for c in categorias %}
+          <tr>
+            <td><strong>{{ c.nome }}</strong></td>
+            <td style="color:var(--muted)">{{ c.descricao or '—' }}</td>
+            <td>
+              <a href="/categorias/editar/{{ c.id_categoria }}" class="btn btn-secondary btn-sm">Editar</a>
+              <a href="/categorias/excluir/{{ c.id_categoria }}" class="btn btn-danger btn-sm" onclick="return confirm('Excluir categoria?')">Excluir</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" style="color:var(--muted);text-align:center;">Nenhuma categoria.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

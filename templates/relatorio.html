@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Relatório Financeiro{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">Relatório Financeiro</h1>
+</div>
+
+<!-- Filtro por data -->
+<form method="GET" action="/relatorio">
+  <div class="form-group">
+    <label>Data</label>
+    <input type="date" name="data" value="{{ data }}">
+  </div>
+  <button class="btn btn-primary" type="submit">Filtrar</button>
+</form>
+
+<hr>
+
+<div class="card">
+
+  <h3>Total Geral</h3>
+  <p style="font-size:1.5rem;color:var(--gold);">
+    R$ {{ "%.2f"|format(total_geral) }}
+  </p>
+
+</div>
+
+<div class="two-col">
+
+  <!-- Taxas de entrega -->
+  <div class="card">
+    <h3>Taxas de Entrega</h3>
+    <p>Total: R$ {{ "%.2f"|format(total_entrega) }}</p>
+
+    <ul>
+      {% for p in entrega_lista %}
+        <li>
+          Pedido #{{ p.pedido_id }} —
+          R$ {{ "%.2f"|format(p.pedidos.taxa_entrega|float) }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- Taxas de serviço -->
+  <div class="card">
+    <h3>Taxas de Serviço</h3>
+    <p>Total: R$ {{ "%.2f"|format(total_servico) }}</p>
+
+    <ul>
+      {% for p in servico_lista %}
+        <li>
+          Pedido #{{ p.pedido_id }} —
+          R$ {{ "%.2f"|format(p.valor_taxa_servico|float) }}
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+
+</div>
+
+<hr>
+
+<div class="card">
+  <h3>Pedidos com Pagamento Pendente</h3>
+
+  {% if pendentes %}
+    <ul>
+      {% for p in pendentes %}
+        <li>
+          Pedido #{{ p.id }} —
+          {{ p.tipo_pedido }} —
+          Status: {{ p.status_pedido }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p style="color:var(--muted);">Nenhum pedido pendente.</p>
+  {% endif %}
+
+</div>
+
+{% endblock %}

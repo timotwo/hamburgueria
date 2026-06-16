@@ -1,0 +1,69 @@
+
+{% extends "base.html" %}
+{% block title %}Produtos — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Produtos</h1>
+</div>
+<div class="two-col">
+  <div class="card">
+    <div class="card-title">{% if produto %}Editar Produto{% else %}Novo Produto{% endif %}</div>
+    <form method="POST" enctype="multipart/form-data"
+      action="{% if produto %}/produtos/atualizar/{{ produto.id_produto }}{% else %}/produtos/adicionar{% endif %}">
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Nome</label>
+        <input type="text" name="nome" required value="{{ produto.nome if produto else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Categoria</label>
+        <select name="id_categoria" required>
+          <option value="">Selecione...</option>
+          {% for c in categorias %}
+            <option value="{{ c.id_categoria }}" {% if produto and produto.id_categoria == c.id_categoria %}selected{% endif %}>{{ c.nome }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Descrição</label>
+        <textarea name="descricao">{{ produto.descricao if produto else '' }}</textarea>
+      </div>
+      <div class="form-group" style="margin-bottom:10px;">
+        <label>Preço (R$)</label>
+        <input type="number" name="preco" step="0.01" min="0" required value="{{ produto.preco if produto else '' }}"/>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Foto</label>
+        <input type="file" name="foto" accept="image/*"/>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button type="submit" class="btn btn-primary">{% if produto %}Salvar{% else %}Adicionar{% endif %}</button>
+        {% if produto %}<a href="/produtos" class="btn btn-secondary">Cancelar</a>{% endif %}
+      </div>
+    </form>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Produtos Cadastrados</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Nome</th><th>Categoria</th><th>Preço</th><th>Ações</th></tr></thead>
+        <tbody>
+          {% for p in produtos %}
+          <tr>
+            <td><strong>{{ p.nome }}</strong><br><small style="color:var(--muted)">{{ p.descricao[:40] if p.descricao else '' }}…</small></td>
+            <td>{{ p.categorias.nome if p.categorias else '—' }}</td>
+            <td style="color:var(--gold);font-weight:700;">R$ {{ "%.2f"|format(p.preco|float) }}</td>
+            <td>
+              <a href="/produtos/editar/{{ p.id_produto }}" class="btn btn-secondary btn-sm">Editar</a>
+              <a href="/produtos/excluir/{{ p.id_produto }}" class="btn btn-danger btn-sm" onclick="return confirm('Excluir produto?')">Excluir</a>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" style="color:var(--muted);text-align:center;">Nenhum produto.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>{% block title %}Vendas Burger{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+{% if session.usuario_id %}
+<nav class="navbar">
+  <div class="nav-brand">🍔 <span>Vendas Burger</span></div>
+  <div class="nav-links">
+    {% set nivel = session.nivel_acesso %}
+    {% if nivel in ['ADMINISTRADOR','GARCON'] %}
+      <a href="/pedidos/novo" class="btn-nav">+ Novo Pedido</a>
+    {% endif %}
+    <a href="/pedidos">Pedidos</a>
+    {% if nivel == 'ADMINISTRADOR' %}
+      <a href="/categorias">Categorias</a>
+      <a href="/produtos">Produtos</a>
+      <a href="/clientes">Clientes</a>
+      <a href="/usuarios">Usuários</a>
+      <a href="/relatorio">Relatório</a>
+    {% endif %}
+    {% if nivel in ['ADMINISTRADOR','GARCON','ENTREGADOR'] %}
+      <a href="/pagamentos">Pagamentos</a>
+      <a href="/pagamentos/historico">Histórico</a>
+    {% endif %}
+    <a href="/cardapio" target="_blank">Cardápio</a>
+    <span class="nav-user">{{ session.usuario_nome }} ({{ nivel }})</span>
+    <a href="/logout" class="btn-nav btn-logout">Sair</a>
+  </div>
+</nav>
+{% endif %}
+
+<main class="container">
+  {% with msgs = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in msgs %}
+      <div class="alert alert-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+</body>
+</html>

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Pedidos — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Pedidos</h1>
+  {% if session.nivel_acesso in ['ADMINISTRADOR','GARCON'] %}
+    <a href="/pedidos/novo" class="btn btn-primary">+ Novo Pedido</a>
+  {% endif %}
+</div>
+
+<!-- Filtros -->
+<form method="GET" action="/pedidos">
+  <div class="filtros">
+    <div class="form-group">
+      <label>Nº Pedido</label>
+      <input type="text" name="numero" value="{{ request.args.get('numero','') }}" placeholder="#"/>
+    </div>
+    <div class="form-group">
+      <label>Tipo</label>
+      <select name="tipo">
+        <option value="">Todos</option>
+        <option value="CONSUMO_LOCAL" {% if request.args.get('tipo')=='CONSUMO_LOCAL' %}selected{% endif %}>Consumo Local</option>
+        <option value="DELIVERY" {% if request.args.get('tipo')=='DELIVERY' %}selected{% endif %}>Delivery</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Status</label>
+      <select name="status">
+        <option value="">Todos</option>
+        {% for s in ['CADASTRADO','EM_PRODUCAO','PRONTO','SAIU_ENTREGA','ENTREGUE','RETORNADO'] %}
+          <option value="{{ s }}" {% if request.args.get('status')==s %}selected{% endif %}>{{ s.replace('_',' ') }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Mesa</label>
+      <input type="text" name="mesa" value="{{ request.args.get('mesa','') }}" placeholder="Nº"/>
+    </div>
+    <div class="form-group">
+      <label>Cliente</label>
+      <input type="text" name="cliente" value="{{ request.args.get('cliente','') }}"/>
+    </div>
+    <div class="form-group">
+      <label>Data</label>
+      <input type="date" name="data" value="{{ request.args.get('data','') }}"/>
+    </div>
+    <button type="submit" class="btn btn-secondary">Filtrar</button>
+    <a href="/pedidos" class="btn btn-secondary">Limpar</a>
+  </div>
+</form>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Tipo</th>
+          <th>Mesa/Cliente</th>
+          <th>Status</th>
+          <th>Data</th>
+          <th>Taxa Entrega</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in pedidos %}
+        <tr style="cursor:pointer;" onclick="location.href='/pedidos/detalhe/{{ p.id }}'">
+          <td><strong>#{{ p.id }}</strong></td>
+          <td>
+            {% if p.tipo_pedido == 'DELIVERY' %}
+              <span class="badge badge-delivery">🛵 Delivery</span>
+            {% else %}
+              <span class="badge badge-local">🍽️ Local</span>
+            {% endif %}
+          </td>
+          <td>
+            {% if p.tipo_pedido == 'CONSUMO_LOCAL' %}Mesa {{ p.numero_mesa }}
+            {% elif p.clientes %}{{ p.clientes.nome }}
+            {% else %}—{% endif %}
+          </td>
+          <td>
+            <span class="badge badge-{{ p.status_pedido|lower }}">{{ p.status_pedido.replace('_',' ') }}</span>
+          </td>
+          <td style="color:var(--muted);font-size:.82rem;">{{ p.data_pedido[:16] if p.data_pedido else '—' }}</td>
+          <td>{% if p.taxa_entrega and p.taxa_entrega > 0 %}R$ {{ "%.2f"|format(p.taxa_entrega|float) }}{% else %}—{% endif %}</td>
+          <td><a href="/pedidos/detalhe/{{ p.id }}" class="btn btn-secondary btn-sm">Ver</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" style="color:var(--muted);text-align:center;padding:24px;">Nenhum pedido encontrado.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+

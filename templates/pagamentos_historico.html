@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Histórico de Pagamentos{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+  <h1 class="page-title">Histórico de Pagamentos</h1>
+  <a href="/pagamentos" class="btn btn-secondary">← Pendentes</a>
+</div>
+
+<div class="card">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th># Pedido</th>
+          <th>Tipo</th>
+          <th>Cliente</th>
+          <th>Forma</th>
+          <th>Valor</th>
+          <th>Data</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for p in pagamentos %}
+        <tr>
+          <td>#{{ p.pedido_id }}</td>
+
+          <td>
+            {{ p.pedidos.tipo_pedido }}
+          </td>
+
+          <td>
+            {% if p.pedidos.clientes %}
+              {{ p.pedidos.clientes.nome }}
+            {% else %}
+              —
+            {% endif %}
+          </td>
+
+          <td>{{ p.forma_pagamento }}</td>
+
+          <td>R$ {{ "%.2f"|format(p.valor_total|float) }}</td>
+
+          <td style="color:var(--muted);">
+            {{ p.data_pagamento[:16] if p.data_pagamento else '' }}
+          </td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6" style="text-align:center;color:var(--muted);padding:20px;">
+            Nenhum pagamento encontrado
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}

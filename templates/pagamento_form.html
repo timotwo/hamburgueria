@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block title %}Pagamento{% endblock %}
+
+{% block content %}
+<h1>Registrar Pagamento - Pedido #{{ pedido.id }}</h1>
+
+<p>Subtotal: R$ {{ subtotal }}</p>
+<p>Total: R$ {{ total }}</p>
+
+<form method="POST" action="/pagamentos/confirmar/{{ pedido.id }}">
+
+  <label>Forma de pagamento</label>
+  <select name="forma_pagamento">
+    <option value="DINHEIRO">Dinheiro</option>
+    <option value="CREDITO">Crédito</option>
+    <option value="DEBITO">Débito</option>
+    <option value="PIX">PIX</option>
+  </select>
+
+  {% if pedido.tipo_pedido == "CONSUMO_LOCAL" %}
+  <label>
+    <input type="checkbox" name="taxa_servico">
+    Incluir taxa de serviço (10%)
+  </label>
+  {% endif %}
+
+  <button type="submit">Confirmar pagamento</button>
+
+</form>
+
+{% endblock %}

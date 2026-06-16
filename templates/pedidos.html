@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+
+
+<h1>Novo Pedido</h1>
+
+<form method="POST" action="/pedidos/adicionar-item">
+
+<select name="produto_id">
+
+{% for p in produtos %}
+<option value="{{p.id_produto}}">
+{{p.nome}}
+</option>
+{% endfor %}
+
+</select>
+
+<input
+type="number"
+name="quantidade"
+placeholder="Quantidade">
+
+<input
+name="observacoes"
+placeholder="Observações">
+
+<button>
+Adicionar Item
+</button>
+
+</form>
+
+<hr>
+
+<h2>Itens do Pedido</h2>
+
+{% for item in itens %}
+
+<p>
+
+{{item.produto_nome}}
+-
+Qtd: {{item.quantidade}}
+-
+{{item.observacoes}}
+
+<a href="/pedidos/remover-item/{{loop.index0}}">
+Excluir
+</a>
+
+</p>
+
+{% endfor %}
+
+<hr>
+
+<form method="POST" action="/pedidos/concluir">
+
+<select name="tipo_pedido">
+
+<option value="CONSUMO_LOCAL">
+Consumo Local
+</option>
+
+<option value="DELIVERY">
+Delivery
+</option>
+
+</select>
+
+<input
+name="numero_mesa"
+placeholder="Mesa">
+
+<select name="cliente_id">
+
+<option value="">
+Cliente
+</option>
+
+{% for c in clientes %}
+<option value="{{c.id}}">
+{{c.nome}}
+</option>
+{% endfor %}
+
+</select>
+
+<input
+name="taxa_entrega"
+placeholder="Taxa de entrega">
+
+<button>
+Concluir Pedido
+</button>
+
+</form>
+
+</body>
+</html>

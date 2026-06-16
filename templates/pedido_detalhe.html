@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+
+{% extends "base.html" %}
+{% block title %}Pedido #{{ pedido.id }} — Vendas Burger{% endblock %}
+{% block content %}
+<div class="page-header">
+  <h1 class="page-title">Pedido #{{ pedido.id }}</h1>
+  <a href="/pedidos" class="btn btn-secondary">← Voltar</a>
+</div>
+
+<div class="two-col">
+  <div>
+    <div class="card">
+      <div class="detail-grid">
+        <div class="detail-item">
+          <div class="detail-label">Tipo</div>
+          <div class="detail-value">
+            {% if pedido.tipo_pedido == 'DELIVERY' %}🛵 Delivery{% else %}🍽️ Consumo Local{% endif %}
+          </div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Status</div>
+          <div class="detail-value">
+            <span class="badge badge-{{ pedido.status_pedido|lower }}">{{ pedido.status_pedido.replace('_',' ') }}</span>
+          </div>
+        </div>
+        {% if pedido.tipo_pedido == 'CONSUMO_LOCAL' %}
+        <div class="detail-item">
+          <div class="detail-label">Mesa</div>
+          <div class="detail-value">{{ pedido.numero_mesa }}</div>
+        </div>
+        {% endif %}
+        {% if pedido.clientes %}
+        <div class="detail-item">
+          <div class="detail-label">Cliente</div>
+          <div class="detail-value">{{ pedido.clientes.nome }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Telefone</div>
+          <div class="detail-value">{{ pedido.clientes.telefone }}</div>
+        </div>
+        <div class="detail-item">
+          <div class="detail-label">Endereço</div>
+          <div class="detail-value" style="font-size:.85rem;">{{ pedido.clientes.endereco }}</div>
+        </div>
+        {% endif %}
+        <div class="detail-item">
+          <div class="detail-label">Data</div>
+          <div class="detail-value" style="font-size:.85rem;">{{ pedido.data_pedido[:16] if pedido.data_pedido else '—' }}</div>
+        </div>
+        {% if pedido.taxa_entrega and pedido.taxa_entrega > 0 %}
+        <div class="detail-item">
+          <div class="detail-label">Taxa Entrega</div>
+          <div class="detail-value" style="color:var(--gold)">R$ {{ "%.2f"|format(pedido.taxa_entrega|float) }}</div>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Subtotal -->
+      <div style="margin-top:12px;font-family:var(--font-head);font-size:1.6rem;color:var(--gold);">
+        Subtotal: R$ {{ "%.2f"|format(subtotal) }}
+        {% if pedido.taxa_entrega and pedido.taxa_entrega > 0 %}
+        <br><span style="font-size:1.1rem;color:var(--muted);">+ Taxa Entrega: R$ {{ "%.2f"|format(pedido.taxa_entrega|float) }}</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Mudar status (RF09) -->
+    {% set nivel = session.nivel_acesso %}
+    {% if nivel in ['ADMINISTRADOR','GARCON','CHAPISTA','ENTREGADOR'] %}
+    <div class="card">
+      <div class="card-title">Alterar Status</div>
+      <form method="POST" action="/pedidos/mudar-status/{{ pedido.id }}">
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;">
+          {% set todos_status = ['CADASTRADO','EM_PRODUCAO','PRONTO','SAIU_ENTREGA','ENTREGUE','RETORNADO'] %}
+          {% set permitidos = {
+            'ADMINISTRADOR': todos_status,
+            'GARCON': todos_status,
+            'CHAPISTA': ['EM_PRODUCAO','PRONTO'],
+            'ENTREGADOR': ['SAIU_ENTREGA','ENTREGUE','RETORNADO']
+          } %}
+          {% for s in permitidos.get(nivel, []) %}
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;">
+              <input type="radio" name="status" value="{{ s }}" {% if pedido.status_pedido == s %}checked{% endif %}/>
+              <span class="badge badge-{{ s|lower }}">{{ s.replace('_',' ') }}</span>
+            </label>
+          {% endfor %}
+        </div>
+        <button type="submit" class="btn btn-primary">Salvar Status</button>
+      </form>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- Itens -->
+  <div class="card">
+    <div class="card-title">Itens do Pedido</div>
+    <ul class="item-list">
+      {% for item in itens %}
+      <li>
+        <div class="item-info">
+          <strong>{{ item.produtos.nome }}</strong>
+          <small>{{ item.quantidade }}x — R$ {{ "%.2f"|format(item.produtos.preco|float) }} cada</small>
+          {% if item.observacoes %}<small style="color:var(--warning)">📝 {{ item.observacoes }}</small>{% endif %}
+        </div>
+        <strong style="color:var(--gold)">R$ {{ "%.2f"|format(item.quantidade * item.produtos.preco|float) }}</strong>
+      </li>
+      {% endfor %}
+    </ul>
+    <div style="text-align:right;margin-top:14px;padding-top:14px;border-top:1px solid var(--border);">
+      <span style="font-family:var(--font-head);font-size:1.4rem;color:var(--gold);">
+        Total: R$ {{ "%.2f"|format(subtotal + (pedido.taxa_entrega|float if pedido.taxa_entrega else 0)) }}
+      </span>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+</body>
+</html>
