@@ -345,3 +345,79 @@ tbody tr:last-child { border-bottom: none; }
 }
 .relatorio-section { margin-bottom: 28px; }
 .section-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 12px; }
+
+
+
+/* ===== MOBILE ===== */
+@media (max-width: 768px) {
+
+  .navbar {
+    flex-direction: column;
+    height: auto;
+    padding: 12px;
+    gap: 12px;
+  }
+
+  .nav-brand {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .nav-links a,
+  .nav-user {
+    width: 100%;
+    text-align: center;
+    padding: 10px;
+  }
+
+  .nav-user {
+    border: none;
+    background: var(--surface);
+    border-radius: var(--radius);
+  }
+
+  .container {
+    padding: 15px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filtros {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filtros input,
+  .filtros select,
+  .filtros button {
+    width: 100%;
+  }
+
+  .produtos-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardapio-hero {
+    padding: 25px 15px;
+  }
+
+  .cardapio-hero h1 {
+    font-size: 2.2rem;
+  }
+}
