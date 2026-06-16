@@ -1,15 +1,21 @@
-from flask import Flask, render_template, request, redirect, session, jsonify, flash
-from supabase_client import supabase
-from functools import wraps
+from dotenv import load_dotenv
 import os
+
+load_dotenv()
+
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+from flask import Flask, render_template, request, redirect, session, jsonify, flash
+from supabase import create_client
+from functools import wraps
 from datetime import datetime, date
- 
+
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
 app = Flask(__name__)
 app.secret_key = "hamburgueria_rf7_vendas_burger_2026"
 app.config["UPLOAD_FOLDER"] = "uploads"
- 
-
-
 
  
 def login_required(f):
@@ -538,5 +544,4 @@ def cardapio():
     return render_template("cardapio.html", categorias=por_categoria)
  
 if __name__ == "__main__":
-    app.run(debug=True)
- 
+    app.run(host="0.0.0.0", port=10000)
