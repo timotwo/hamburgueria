@@ -10,9 +10,10 @@
 <body>
 {% if session.usuario_id %}
 <nav class="navbar">
+  <div class="nav-toggle" onclick="toggleMenu()">☰</div>
   <div class="nav-brand">🍔 <span>Vendas Burger</span></div>
   <div class="nav-links">
-    <div class="nav-toggle" onclick="toggleMenu()">☰</div>
+    
     {% set nivel = session.nivel_acesso %}
     {% if nivel in ['ADMINISTRADOR','GARCON'] %}
       <a href="/pedidos/novo" class="btn-nav">+ Novo Pedido</a>
